@@ -12,6 +12,18 @@
             color: #c9d1d9;
             min-height: 100vh;
         }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #f0f6fc;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+        
         .header {
             background: #161b22;
             border-bottom: 1px solid #30363d;
@@ -42,6 +54,29 @@
             background: #161b22;
             border-right: 1px solid #30363d;
             padding: 16px 0;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            position: fixed;
+            top: 65px;
+            left: 0;
+            height: calc(100vh - 65px);
+            z-index: 100;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.5);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        .sidebar-overlay.active {
+            display: block;
         }
         .nav-item {
             padding: 10px 20px;
@@ -60,10 +95,43 @@
         .nav-item.active {
             border-left: 3px solid #58a6ff;
         }
+        
+        /* Mobile Bottom Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        .mobile-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            font-size: 11px;
+            color: #8b949e;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mobile-nav-item.active {
+            color: #58a6ff;
+        }
+        .mobile-nav-item .icon {
+            font-size: 20px;
+        }
+        
         .main {
             flex: 1;
             padding: 24px;
             overflow-y: auto;
+            padding-bottom: 80px; /* Space for mobile nav */
         }
         .stats {
             display: grid;
@@ -98,6 +166,72 @@
         .trend { font-size: 12px; margin-top: 4px; }
         .trend.up { color: #238636; }
         .trend.down { color: #da3633; }
+        
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .menu-toggle {
+                display: block;
+            }
+            .header h1 {
+                font-size: 16px;
+            }
+            .header h1 span {
+                display: none;
+            }
+            .last-updated {
+                display: none;
+            }
+            .sidebar {
+                position: fixed;
+                top: 65px;
+                left: 0;
+                height: calc(100vh - 65px);
+                z-index: 100;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main {
+                padding: 16px;
+                padding-bottom: 80px;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-card {
+                padding: 16px;
+            }
+            .stat-card .value {
+                font-size: 24px;
+            }
+            .board {
+                grid-template-columns: 1fr !important;
+            }
+            .content-wrapper {
+                flex-direction: column !important;
+            }
+            .right-sidebar {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+            .mobile-nav {
+                display: flex;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card h3 {
+                font-size: 10px;
+            }
+            .stat-card .value {
+                font-size: 20px;
+            }
+        }
         
         .content-wrapper {
             display: flex;
@@ -283,17 +417,22 @@
 </head>
 <body>
     <div class="header">
-        <h1>🚀 Flex Super — Mission Control</h1>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h1>🚀 <span>Flex Super — Mission Control</span></h1>
+        </div>
         <div class="last-updated">Last updated: 2026-03-08</div>
     </div>
     
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
     <div class="container">
-        <div class="sidebar">
-            <div class="nav-item active" data-view="dashboard">📊 Dashboard</div>
-            <div class="nav-item" data-view="cron">🤖 Cron Jobs</div>
-            <div class="nav-item" data-view="projects">📁 Projects</div>
-            <div class="nav-item" data-view="deals">💼 Deals</div>
-            <div class="nav-item" data-view="calendar">📅 Calendar</div>
+        <div class="sidebar" id="sidebar">
+            <div class="nav-item active" data-view="dashboard" onclick="navigateTo('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" data-view="cron" onclick="navigateTo('cron')">🤖 Cron Jobs</div>
+            <div class="nav-item" data-view="projects" onclick="navigateTo('projects')">📁 Projects</div>
+            <div class="nav-item" data-view="deals" onclick="navigateTo('deals')">💼 Deals</div>
+            <div class="nav-item" data-view="calendar" onclick="navigateTo('calendar')">📅 Calendar</div>
         </div>
         
         <div class="main">
@@ -477,16 +616,65 @@
         </div>
     </div>
 
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-item active" data-view="dashboard" onclick="navigateTo('dashboard')">
+            <span class="icon">📊</span>
+            <span>Dashboard</span>
+        </div>
+        <div class="mobile-nav-item" data-view="cron" onclick="navigateTo('cron')">
+            <span class="icon">🤖</span>
+            <span>Cron</span>
+        </div>
+        <div class="mobile-nav-item" data-view="projects" onclick="navigateTo('projects')">
+            <span class="icon">📁</span>
+            <span>Projects</span>
+        </div>
+        <div class="mobile-nav-item" data-view="deals" onclick="navigateTo('deals')">
+            <span class="icon">💼</span>
+            <span>Deals</span>
+        </div>
+        <div class="mobile-nav-item" data-view="calendar" onclick="navigateTo('calendar')">
+            <span class="icon">📅</span>
+            <span>Calendar</span>
+        </div>
+    </div>
+
     <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+        
         // Navigation
+        function navigateTo(view) {
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            
+            // Update sidebar nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-item[data-view="' + view + '"]').forEach(n => n.classList.add('active'));
+            
+            // Update mobile nav
+            document.querySelectorAll('.mobile-nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-item[data-view="' + view + '"]').forEach(n => n.classList.add('active'));
+            
+            // Switch views
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(view + '-view').classList.add('active');
+        }
+        
+        // Desktop sidebar nav clicks
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-                document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-                document.getElementById(item.dataset.view + '-view').classList.add('active');
+                const view = item.dataset.view;
+                navigateTo(view);
             });
         });
+
+        // Card data and modal functions remain the same...
 
         // Card data
         const cardData = {
