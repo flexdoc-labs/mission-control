@@ -57,6 +57,9 @@
             background: #21262d;
             color: #f0f6fc;
         }
+        .nav-item.active {
+            border-left: 3px solid #58a6ff;
+        }
         .main {
             flex: 1;
             padding: 24px;
@@ -73,12 +76,18 @@
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            border-color: #58a6ff;
         }
         .stat-card h3 {
             font-size: 12px;
             font-weight: 500;
             color: #8b949e;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
         .stat-card .value {
@@ -86,83 +95,479 @@
             font-weight: 700;
             color: #f0f6fc;
         }
+        .trend { font-size: 12px; margin-top: 4px; }
         .trend.up { color: #238636; }
         .trend.down { color: #da3633; }
-        .trend { font-size: 12px; margin-top: 4px; }
         
-        .cron-list {
+        .content-wrapper {
+            display: flex;
+            gap: 24px;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .column {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 400px;
+        }
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #30363d;
+        }
+        .column-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .column-count {
+            background: #30363d;
+            color: #f0f6fc;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .card {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f0f6fc;
+            margin-bottom: 8px;
+        }
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+        .card-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .tag-cron { background: #1f6feb33; color: #58a6ff; }
+        .tag-project { background: #23863633; color: #3fb950; }
+        .tag-deal { background: #da363333; color: #f85149; }
+        .tag-meeting { background: #a371f733; color: #bc8cff; }
+        .status-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-active { background: #238636; }
+        .status-pending { background: #d29922; }
+        
+        .right-sidebar {
+            width: 320px;
+            min-width: 320px;
+        }
+        .activity-feed {
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 16px;
         }
-        .cron-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
+        .activity-header {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #30363d;
         }
-        .cron-item:last-child { border-bottom: none; }
-        .cron-name { font-weight: 500; }
-        .cron-status {
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+        }
+        .activity-item:hover { background: #21262d; margin: 0 -16px; padding: 12px 16px; border-radius: 6px; }
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .activity-text {
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+        .activity-time {
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { font-size: 18px; font-weight: 600; color: #f0f6fc; }
+        .modal-close {
+            background: none; border: none; color: #8b949e;
+            font-size: 24px; cursor: pointer;
+        }
+        .modal-body { padding: 24px; }
+        .modal-section { margin-bottom: 20px; }
+        .modal-section h4 {
+            font-size: 12px; font-weight: 600; color: #8b949e;
+            text-transform: uppercase; margin-bottom: 8px;
+        }
+        .modal-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
             font-size: 12px;
+            font-weight: 500;
         }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        @media (max-width: 1400px) {
+            .content-wrapper { flex-direction: column; }
+            .right-sidebar { width: 100%; }
         }
-        .status-healthy { background: #238636; }
-        .status-error { background: #da3633; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🚀 Flex Super — Mission Control</h1>
-        <div class="last-updated">Last updated: 2026-03-08 12:08 UTC</div>
+        <div class="last-updated">Last updated: 2026-03-08</div>
     </div>
     
     <div class="container">
         <div class="sidebar">
-            <div class="nav-item active">📊 Dashboard</div>
-            <div class="nav-item">🤖 Cron Jobs (0)</div>
-            <div class="nav-item">📁 Projects</div>
-            <div class="nav-item">💼 Deals</div>
-            <div class="nav-item">📅 Calendar</div>
+            <div class="nav-item active" data-view="dashboard">📊 Dashboard</div>
+            <div class="nav-item" data-view="cron">🤖 Cron Jobs</div>
+            <div class="nav-item" data-view="projects">📁 Projects</div>
+            <div class="nav-item" data-view="deals">💼 Deals</div>
+            <div class="nav-item" data-view="calendar">📅 Calendar</div>
         </div>
         
         <div class="main">
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Active Cron Jobs</h3>
-                    <div class="value">0</div>
-                    <div class="trend up">↗ 0 healthy</div>
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view-section active">
+                <div class="stats">
+                    <div class="stat-card" onclick="showStatDetail('cron')">
+                        <h3>Active Cron Jobs</h3>
+                        <div class="value">10</div>
+                        <div class="trend up">↗ 9 healthy</div>
+                    </div>
+                    <div class="stat-card" onclick="showStatDetail('projects')">
+                        <h3>Active Projects</h3>
+                        <div class="value">4</div>
+                        <div class="trend up">↗ 2 in progress</div>
+                    </div>
+                    <div class="stat-card" onclick="showStatDetail('deals')">
+                        <h3>Days to ColCap</h3>
+                        <div class="value">51</div>
+                        <div class="trend down">Apr 28 meeting</div>
+                    </div>
+                    <div class="stat-card" onclick="showStatDetail('intel')">
+                        <h3>Market Intel</h3>
+                        <div class="value">Daily</div>
+                        <div class="trend up">AFR + X + Brokers</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>Days to ColCap</h3>
-                    <div class="value">50</div>
-                    <div class="trend down">Apr 28 meeting</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Active Projects</h3>
-                    <div class="value">4</div>
-                    <div class="trend up">2 in progress</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Market Intel</h3>
-                    <div class="value">Daily</div>
-                    <div class="trend up">AFR + X + Brokers</div>
+
+                <div class="content-wrapper">
+                    <div class="main-content">
+                        <div class="board">
+                            <!-- Recurring Column -->
+                            <div class="column">
+                                <div class="column-header">
+                                    <span class="column-title">⏰ Recurring</span>
+                                    <span class="column-count">4</span>
+                                </div>
+                                <div class="card" onclick="showCardDetail('github-backup')">
+                                    <div class="card-title">GitHub Backup</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-cron">Cron</span>
+                                        <span class="status-badge status-active"></span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('market-intel')">
+                                    <div class="card-title">Daily Market Intel</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-cron">Cron</span>
+                                        <span class="status-badge status-active"></span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('checkin-prompt')">
+                                    <div class="card-title">9AM Check-in Prompt</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-cron">Cron</span>
+                                        <span class="status-badge status-active"></span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('learning-summary')">
+                                    <div class="card-title">Weekly Learning Summary</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-cron">Cron</span>
+                                        <span class="status-badge status-active"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Backlog Column -->
+                            <div class="column">
+                                <div class="column-header">
+                                    <span class="column-title">📋 Backlog</span>
+                                    <span class="column-count">2</span>
+                                </div>
+                                <div class="card" onclick="showCardDetail('colcap-prep')">
+                                    <div class="card-title">ColCap Meeting Prep</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-meeting">Meeting</span>
+                                        <span>Apr 28</span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('ximalaya-setup')">
+                                    <div class="card-title">Ximalaya Platform Setup</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-project">Podcast</span>
+                                        <span>Xinyi</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- In Progress Column -->
+                            <div class="column">
+                                <div class="column-header">
+                                    <span class="column-title">🔄 In Progress</span>
+                                    <span class="column-count">3</span>
+                                </div>
+                                <div class="card" onclick="showCardDetail('acl-app')">
+                                    <div class="card-title">ACL Application</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-project">Legal</span>
+                                        <span class="status-badge status-pending"></span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('podcast-strategy')">
+                                    <div class="card-title">Chinese Podcast Strategy</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-project">Marketing</span>
+                                        <span class="status-badge status-active"></span>
+                                    </div>
+                                </div>
+                                <div class="card" onclick="showCardDetail('brand-launch')">
+                                    <div class="card-title">Flex Super Brand Launch</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-project">Brand</span>
+                                        <span class="status-badge status-pending"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Review Column -->
+                            <div class="column">
+                                <div class="column-header">
+                                    <span class="column-title">✅ Review</span>
+                                    <span class="column-count">1</span>
+                                </div>
+                                <div class="card" onclick="showCardDetail('bogoevski-research')">
+                                    <div class="card-title">Michael Bogoevski Research</div>
+                                    <div class="card-meta">
+                                        <span class="card-tag tag-deal">Capital</span>
+                                        <span>Done</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right-sidebar">
+                        <div class="activity-feed">
+                            <div class="activity-header">📡 Live Activity</div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #1f6feb33;">🤖</div>
+                                <div>
+                                    <div class="activity-text">Daily Market Intel cron ran</div>
+                                    <div class="activity-time">Just now</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #23863633;">✅</div>
+                                <div>
+                                    <div class="activity-text">GitHub backup completed</div>
+                                    <div class="activity-time">5 mins ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #a371f733;">📝</div>
+                                <div>
+                                    <div class="activity-text">Jane Wu research posted</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <h3 style="margin-bottom: 16px;">🤖 Cron Job Status</h3>
-            <div class="cron-list">
-            </div>
+
+            <!-- Other Views -->
+            <div id="cron-view" class="view-section"><h2>🤖 Cron Jobs>/h2><p>10 active cron jobs monitoring Flex Super operations.</p></div>
+            <div id="projects-view" class="view-section"><h2>📁 Projects</h2><p>4 active projects tracked in Mission Control.</p></div>
+            <div id="deals-view" class="view-section"><h2>💼 Deals</h2><p>Deal pipeline: Origin MMS, ColCap, capital partnerships.</p></div>
+            <div id="calendar-view" class="view-section"><h2>📅 Calendar</h2><p>Upcoming: Anamika debrief (Mar 9), Bogoevski check-in (Mar 9), ColCap meeting (Apr 28).</p></div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Details</div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+                document.getElementById(item.dataset.view + '-view').classList.add('active');
+            });
+        });
+
+        // Card data
+        const cardData = {
+            'github-backup': { title: 'GitHub Backup', tag: 'Cron', tagClass: 'tag-cron', sections: [
+                { title: 'Schedule', content: 'Daily at midnight Sydney time' },
+                { title: 'Status', content: 'Active — backing up workspace to GitHub' }
+            ]},
+            'market-intel': { title: 'Daily Market Intel', tag: 'Cron', tagClass: 'tag-cron', sections: [
+                { title: 'Schedule', content: 'Daily at 9:00 AM Sydney time' },
+                { title: 'Sources', content: 'AFR, X/Twitter, Australian Broker sites' },
+                { title: 'Queries', content: 'SMSF property, mortgage manager, non-bank lending, SMSF loans, AMP SuperEdge' }
+            ]},
+            'checkin-prompt': { title: '9AM Check-in Prompt', tag: 'Cron', tagClass: 'tag-cron', sections: [
+                { title: 'Schedule', content: 'Daily at 9:00 AM Sydney time' },
+                { title: 'Action', content: 'Prompts Peter to reply, then Alex checks inbox properly' }
+            ]},
+            'learning-summary': { title: 'Weekly Learning Summary', tag: 'Cron', tagClass: 'tag-cron', sections: [
+                { title: 'Schedule', content: 'Fridays at 5:00 PM Sydney time' },
+                { title: 'Content', content: 'Reviews ERRORS.md and LEARNINGS.md, posts insights' }
+            ]},
+            'colcap-prep': { title: 'ColCap Meeting Prep', tag: 'Meeting', tagClass: 'tag-meeting', sections: [
+                { title: 'Date', content: 'April 28, 2026' },
+                { title: 'Attendee', content: 'Ramon Sebastian (ColCap/Origin MMS)' },
+                { title: 'Goal', content: 'Secure mortgage manager partnership pathway' }
+            ]},
+            'ximalaya-setup': { title: 'Ximalaya Platform Setup', tag: 'Podcast', tagClass: 'tag-project', sections: [
+                { title: 'Owner', content: 'Xinyi Wu' },
+                { title: 'Status', content: 'In Progress' },
+                { title: 'Note', content: 'No business registration needed — simpler than WeChat' }
+            ]},
+            'acl-app': { title: 'ACL Application', tag: 'Legal', tagClass: 'tag-project', sections: [
+                { title: 'Status', content: 'Pending — lawyers drafting documents' },
+                { title: 'Critical Path', content: 'Must secure ACL to become mortgage manager' },
+                { title: 'Next Check', content: 'March 11 — lawyers promised docs this week' }
+            ]},
+            'podcast-strategy': { title: 'Chinese Podcast Strategy', tag: 'Marketing', tagClass: 'tag-project', sections: [
+                { title: 'Status', content: 'Active — Jane Wu research complete' },
+                { title: 'Key Finding', content: 'No direct Mandarin SMSF property podcast competition' },
+                { title: 'Platforms', content: 'Ximalaya (critical), WeChat (essential), Spotify/Apple' }
+            ]},
+            'brand-launch': { title: 'Flex Super Brand Launch', tag: 'Brand', tagClass: 'tag-project', sections: [
+                { title: 'Status', content: 'Pending — waiting on ACL' },
+                { title: 'Question', content: 'Soft-launch as mortgage manager first, or wait for ACL?' }
+            ]},
+            'bogoevski-research': { title: 'Michael Bogoevski Research', tag: 'Capital', tagClass: 'tag-deal', sections: [
+                { title: 'Status', content: 'Complete — deck sent, awaiting feedback' },
+                { title: 'Role', content: 'Senior Sales Advisor at Barclay Pearce Capital' },
+                { title: 'Previous', content: '17 years at CMC Markets' }
+            ]}
+        };
+
+        function showCardDetail(cardId) {
+            const data = cardData[cardId];
+            if (!data) return;
+            document.getElementById('modal-title').textContent = data.title;
+            let html = `<span class="modal-tag ${data.tagClass}">${data.tag}</span><br><br>`;
+            data.sections.forEach(s => {
+                html += `<div class="modal-section"><h4>${s.title}</h4><p>${s.content}</p></div>`;
+            });
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function showStatDetail(type) {
+            const titles = { 'cron': 'Cron Jobs', 'projects': 'Projects', 'deals': 'Deals', 'intel': 'Market Intel' };
+            document.getElementById('modal-title').textContent = titles[type];
+            document.getElementById('modal-body').innerHTML = `<div class="modal-section"><h4>Details</h4><p>Click through sidebar or cards for detailed information.</p></div>`;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').addEventListener('click', e => {
+            if (e.target.id === 'modal') closeModal();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
 </body>
 </html>
